@@ -29,6 +29,12 @@ def receiveUserInputIntegersOnly
   return @numericalFibNumber
 end
 
+def fib(fibNum)
+  #Print the result of the fibonacci number for that sequence
+  puts fibbonaci(fibNum)
+end
+
+#Main method is not used
 def main
   #Get the user inputted fibonaci sequence number
   fibSequenceNumber = receiveUserInputIntegersOnly
@@ -40,5 +46,3 @@ def main
     puts fibbonaci fibSequenceNumber
   end
 end
-
-main
