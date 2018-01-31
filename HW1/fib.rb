@@ -31,7 +31,7 @@ end
 
 def fib(fibNum)
   #Print the result of the fibonacci number for that sequence
-  puts fibbonaci(fibNum)
+  return fibbonaci(fibNum)
 end
 
 #Main method is not used
