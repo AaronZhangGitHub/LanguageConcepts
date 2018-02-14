@@ -17,16 +17,30 @@ person* createPerson(char *name, char *mother, char *father);
 void beginFamilyTreeInput();
 char *receiveLineOfInputSTDIN(int length);
 
-
 int main(int argc, const char * argv[]){
     person* rootPerson = createRootNode();
-    printf("%s",rootPerson->name);
     beginFamilyTreeInput();
 }
 
 void beginFamilyTreeInput(){
-    printf("Please specify whether to add or delete an entry, or print the tree\n");
-    
+    while(1){
+        printf("Please specify whether to add or delete an entry, or print the tree\n");
+        char *userInput = receiveLineOfInputSTDIN(8);
+        printf("%s\n",userInput);
+        if(strcmp(userInput,"add")==0){
+            printf("add");
+        }else if(strcmp(userInput,"delete")==0){
+            printf("delete");
+        }else if(strcmp(userInput,"print")==0){
+            printf("print");
+        }else if(strcmp(userInput,"quit")==0){
+            printf("Program Terminating\n");
+            exit(0);
+        }else{
+            //Invalid input
+            fprintf(stderr,"Invalid Input, Valid commands: add, delete, print, and quit.");
+        }
+    }
 }
 
 char *receiveLineOfInputSTDIN(int length){
@@ -35,6 +49,8 @@ char *receiveLineOfInputSTDIN(int length){
     if(fgets(userInp,length,stdin)==NULL){
         fprintf(stderr,"Error with receiving user input.");
     }
+    //strip newline
+    userInp[strlen(userInp)-1] = 0;
     return userInp;
 }
 
