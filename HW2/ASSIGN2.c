@@ -50,6 +50,7 @@ int delete(person* root){
     //Get parents
     person* mother = root->mother;
     person* father = root->father;
+    free(root->name);
     free(root);
     if(mother!=NULL && father!=NULL){
         //Leaf
@@ -78,7 +79,7 @@ void deleteHandler(person* root){
     person* nodeToDelete = search(userInpName, root);
     if(nodeToDelete==NULL){
         //Node was not found
-        printf("Person not found\n");
+        printf("name not found\n");
     }else{
         delete(nodeToDelete);
     }
@@ -119,13 +120,14 @@ void beginFamilyTreeInput(struct person* root){
         }else if(strcmp(userInput,"print")==0){
             printf("\n");
             print(root,0);
+            printf("\n");
         }else if(strcmp(userInput,"quit")==0){
             printf("Program Terminating\n");
             delete(root);
             exit(0);
         }else{
             //Invalid input
-            fprintf(stderr,"Invalid Input, Valid commands: add, delete, print, and quit.\n");
+            fprintf(stderr,"invalid command, Valid commands: add, delete, print, and quit.\n");
         }
         free(userInput);
     }
@@ -154,7 +156,7 @@ void addRelation(struct person* root){
     person* childNode = search(child, root);
     if(childNode==NULL){
         //Node was not found
-        printf("Person not found\n");
+        printf("name not found\n");
     }else{
         //Node found
         //Determine if mother or father
@@ -167,7 +169,7 @@ void addRelation(struct person* root){
                 childNode->father->child = childNode;
             }else{
                 //Already has a father
-                printf("Already has a father\n");
+                printf("relationship already exists\n");
             }
         }else if(strcmp(relation,"mother")==0){
             //Check if node has a mother
@@ -178,11 +180,11 @@ void addRelation(struct person* root){
                 childNode->mother->child = childNode;
             }else{
                 //Already has a mother
-                printf("Already has a mother\n");
+                printf("relationship already exists\n");
             }
         }else{
             //error
-            printf("Error with adding");
+            printf("invalid relationship\n");
         }
     }
     free(userInput);
@@ -216,7 +218,7 @@ void receiveLineOfInputSTDIN(char* userInp, int length){
     //receives a line of user input of a given length
     //char *userInp = malloc(sizeof(char)*length);
     if(fgets(userInp,length,stdin)==NULL){
-        fprintf(stderr,"Error with receiving user input.");
+        printf("invalid command\n");
     }
     //strip newline
     userInp[strlen(userInp)-1] = 0;
