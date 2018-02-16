@@ -18,20 +18,28 @@ void beginFamilyTreeInput(person *root);
 void receiveLineOfInputSTDIN(char* userInp, int length);
 void addRelation(person *root);
 struct person *search(char *name, person *root);
+void print(struct person* root, int tabNumber);
 
 int main(int argc, const char * argv[]){
     struct person* rootPerson = createRootNode();
     beginFamilyTreeInput(rootPerson);
 }
-void print(struct person* root){
+void print(struct person* root, int tabNumber){
     if(root!=NULL){
+        for(int i = 0;i<tabNumber;i++){
+            printf("\t");
+        }
         printf("%s\n",root->name);
     }
     if(root->mother!=NULL){
-     print(root->mother);
+        print(root->mother,++tabNumber);
     }
     if(root->father!=NULL){
-        print(root->father);
+        if(tabNumber==0){
+            print(root->father,++tabNumber);
+        }else{
+            print(root->father,tabNumber--);
+        }
     }
 }
 void beginFamilyTreeInput(struct person* root){
@@ -44,7 +52,7 @@ void beginFamilyTreeInput(struct person* root){
         }else if(strcmp(userInput,"delete")==0){
             printf("delete\n");
         }else if(strcmp(userInput,"print")==0){
-            print(root);
+            print(root,0);
         }else if(strcmp(userInput,"quit")==0){
             printf("Program Terminating\n");
             exit(0);
@@ -130,7 +138,8 @@ struct person* search(char *name, struct person* root){
             if(temp!=NULL){
                 return temp;
             }
-        }else if(root->father!=NULL){
+        }
+        if(root->father!=NULL){
             //printf("Searching for father");
             person* tempF = search(name,root->father);
             if(tempF!=NULL){
