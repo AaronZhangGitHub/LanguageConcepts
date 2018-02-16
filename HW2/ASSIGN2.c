@@ -4,35 +4,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct
+typedef struct person
 {
-    char * father;
-    char * mother;
-    char * name;
+    struct person* father;
+    struct person* mother;
+    char* name;
 }person;
 
-person* createRootNode();
+struct person* createRootNode();
 void initializeNode(person ** node);
-person* createPerson(char *name, char *mother, char *father);
-void beginFamilyTreeInput();
-char *receiveLineOfInputSTDIN(int length);
+struct person* createPerson(char *name);
+void beginFamilyTreeInput(person *root);
+void receiveLineOfInputSTDIN(char* userInp, int length);
+void addRelation(person *root);
+struct person *search(char *name, person *root);
 
 int main(int argc, const char * argv[]){
-    person* rootPerson = createRootNode();
-    beginFamilyTreeInput();
+    struct person* rootPerson = createRootNode();
+    beginFamilyTreeInput(rootPerson);
 }
-
-void beginFamilyTreeInput(){
+void print(struct person* root){
+    if(root!=NULL){
+        printf("%s\n",root->name);
+    }
+    if(root->mother!=NULL){
+     print(root->mother);
+    }
+    if(root->father!=NULL){
+        print(root->father);
+    }
+}
+void beginFamilyTreeInput(struct person* root){
     while(1){
         printf("Please specify whether to add or delete an entry, or print the tree\n");
-        char *userInput = receiveLineOfInputSTDIN(8);
-        printf("%s\n",userInput);
+        char *userInput = malloc(sizeof(char)*8);
+        receiveLineOfInputSTDIN(userInput,8);
         if(strcmp(userInput,"add")==0){
-            printf("add");
+            addRelation(root);
         }else if(strcmp(userInput,"delete")==0){
-            printf("delete");
+            printf("delete\n");
         }else if(strcmp(userInput,"print")==0){
-            printf("print");
+            print(root);
         }else if(strcmp(userInput,"quit")==0){
             printf("Program Terminating\n");
             exit(0);
@@ -40,34 +52,110 @@ void beginFamilyTreeInput(){
             //Invalid input
             fprintf(stderr,"Invalid Input, Valid commands: add, delete, print, and quit.");
         }
+        free(userInput);
     }
 }
 
-char *receiveLineOfInputSTDIN(int length){
+void addRelation(struct person* root){
+    printf("Please specify a relation to add\n");
+    //User input
+    char* userInput = malloc(sizeof(char)*65);
+    receiveLineOfInputSTDIN(userInput,65);
+    //Parse input
+    char* relation = strtok(userInput,"(");
+    //Allocate for parent name
+    char* parent = strtok(NULL,",");
+    char* mallocParent = malloc(strlen(parent)*sizeof(char));
+    strcpy(mallocParent,parent);
+    char* child = strtok(NULL,"");
+    child[strlen(child)-1] = 0;
+    //printf("%s,%s,%s,%s\n",relation,parent,child,root->name);
+    
+    //Get node of child
+    printf("Getting node of child\n");
+    //Ats
+    person* childNode = search(child, root);
+    if(childNode==NULL){
+        //Node was not found
+        printf("Person not found\n");
+    }else{
+        //Node found
+        printf("person found: %s\n",childNode->name);
+        
+        //Determine if mother or father
+        if(strcmp(relation,"father")==0){
+            //Check if node has a father
+            if(childNode->father==NULL){
+                //Create parent node
+                person* parentNode = createPerson(mallocParent);
+                childNode->father=parentNode;
+                printf("%s,%s\n",childNode->name,childNode->father->name);
+            }else{
+                //Already has a father
+                printf("Already has a father\n");
+            }
+        }else if(strcmp(relation,"mother")==0){
+            //Check if node has a mother
+            if(childNode->mother==NULL){
+                //Create parent node
+                person* parentNode = createPerson(mallocParent);
+                childNode->mother=parentNode;
+                printf("%s,%s\n",childNode->name,childNode->mother->name);
+            }else{
+                //Already has a mother
+                printf("Already has a mother\n");
+            }
+        }else{
+            //error
+            printf("Error with adding");
+        }
+    }
+    free(userInput);
+}
+
+struct person* search(char *name, struct person*root){
+    //Given a name returns the node if found or null if not
+    if(strcmp(root->name,name)==0){
+        //found
+        return root;
+    }else{
+        if(root->mother!=NULL){
+            //printf("Searching for mother %s,%s\n",root->name,root->mother->name);
+            person* temp = search(name,root->mother);
+            if(temp!=NULL){
+                return temp;
+            }
+        }else if(root->father!=NULL){
+            //printf("Searching for father");
+            return search(name,root->father);
+        }
+    }
+    return NULL;
+}
+
+void receiveLineOfInputSTDIN(char* userInp, int length){
     //receives a line of user input of a given length
-    char *userInp = malloc(sizeof(char)*length);
+    //char *userInp = malloc(sizeof(char)*length);
     if(fgets(userInp,length,stdin)==NULL){
         fprintf(stderr,"Error with receiving user input.");
     }
     //strip newline
     userInp[strlen(userInp)-1] = 0;
-    return userInp;
 }
 
-person* createRootNode(){
+struct person* createRootNode(){
     //Name take in user input from stdin
     printf("Please enter your name:");
-    char *userInpFamilyName = receiveLineOfInputSTDIN(33);
-    return createPerson(userInpFamilyName,NULL,NULL);
+    char *userInpFamilyName = malloc(sizeof(char)*33);
+    receiveLineOfInputSTDIN(userInpFamilyName,33);
+    return createPerson(userInpFamilyName);
 }
 
-person* createPerson(char *name, char *mother, char *father){
+struct person* createPerson(char *name){
     //allocate space for a person, set its respective values
     person *nodePerson =  malloc(sizeof(person));
     initializeNode(&nodePerson);
     nodePerson->name = name;
-    nodePerson->mother = mother;
-    nodePerson->father = father;
     return nodePerson;
 }
 
