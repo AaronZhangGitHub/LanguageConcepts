@@ -117,13 +117,15 @@ void beginFamilyTreeInput(struct person* root){
         }else if(strcmp(userInput,"delete")==0){
             deleteHandler(root);
         }else if(strcmp(userInput,"print")==0){
+            printf("\n");
             print(root,0);
         }else if(strcmp(userInput,"quit")==0){
             printf("Program Terminating\n");
+            delete(root);
             exit(0);
         }else{
             //Invalid input
-            fprintf(stderr,"Invalid Input, Valid commands: add, delete, print, and quit.");
+            fprintf(stderr,"Invalid Input, Valid commands: add, delete, print, and quit.\n");
         }
         free(userInput);
     }
@@ -143,23 +145,18 @@ void addRelation(struct person* root){
     char* relation = strtok(userInput,"(");
     //Allocate for parent name
     char* parent = strtok(NULL,",");
-    char* mallocParent = malloc(strlen(parent)*sizeof(char));
+    char* mallocParent = malloc(strlen(parent)*sizeof(char)+1);
     strcpy(mallocParent,parent);
     char* child = strtok(NULL,"");
     child[strlen(child)-1] = 0;
-    //printf("%s,%s,%s,%s\n",relation,parent,child,root->name);
     
     //Get node of child
-    printf("Getting node of child\n");
-    //Ats
     person* childNode = search(child, root);
     if(childNode==NULL){
         //Node was not found
         printf("Person not found\n");
     }else{
         //Node found
-        printf("person found: %s\n",childNode->name);
-        
         //Determine if mother or father
         if(strcmp(relation,"father")==0){
             //Check if node has a father
@@ -168,7 +165,6 @@ void addRelation(struct person* root){
                 person* parentNode = createPerson(mallocParent);
                 childNode->father=parentNode;
                 childNode->father->child = childNode;
-                printf("%s,%s,%s\n",childNode->name,childNode->father->name, childNode->father->child->name);
             }else{
                 //Already has a father
                 printf("Already has a father\n");
@@ -180,7 +176,6 @@ void addRelation(struct person* root){
                 person* parentNode = createPerson(mallocParent);
                 childNode->mother=parentNode;
                 childNode->mother->child = childNode;
-                printf("%s,%s,%s\n",childNode->name,childNode->mother->name,childNode->mother->child->name);
             }else{
                 //Already has a mother
                 printf("Already has a mother\n");
