@@ -61,6 +61,11 @@ void addRelation(struct person* root){
     //User input
     char* userInput = malloc(sizeof(char)*65);
     receiveLineOfInputSTDIN(userInput,65);
+    //Check if the user wants to quit
+    if(strcmp(userInput,"quit")==0){
+        printf("Program Terminating\n");
+        exit(0);
+    }
     //Parse input
     char* relation = strtok(userInput,"(");
     //Allocate for parent name
@@ -113,7 +118,7 @@ void addRelation(struct person* root){
     free(userInput);
 }
 
-struct person* search(char *name, struct person*root){
+struct person* search(char *name, struct person* root){
     //Given a name returns the node if found or null if not
     if(strcmp(root->name,name)==0){
         //found
@@ -127,7 +132,10 @@ struct person* search(char *name, struct person*root){
             }
         }else if(root->father!=NULL){
             //printf("Searching for father");
-            return search(name,root->father);
+            person* tempF = search(name,root->father);
+            if(tempF!=NULL){
+                return tempF;
+            }
         }
     }
     return NULL;
