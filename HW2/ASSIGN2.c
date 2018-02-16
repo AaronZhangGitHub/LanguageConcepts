@@ -8,6 +8,7 @@ typedef struct person
 {
     struct person* father;
     struct person* mother;
+    struct person* child;
     char* name;
 }person;
 
@@ -18,11 +19,70 @@ void beginFamilyTreeInput(person *root);
 void receiveLineOfInputSTDIN(char* userInp, int length);
 void addRelation(person *root);
 struct person *search(char *name, person *root);
-int print(struct person* root, int tabNumber);
-
+int print(struct person *root, int tabNumber);
+void deleteHandler(person* root);
+int delete(person* root);
 int main(int argc, const char * argv[]){
     struct person* rootPerson = createRootNode();
     beginFamilyTreeInput(rootPerson);
+}
+
+int delete(person* root){
+    //Check if child pointer exists
+    if(root->child!=NULL){
+        person* child = root->child;
+        if(child->mother!=NULL && child->father!=NULL){
+            if(strcmp(child->mother->name,root->name)==0){
+                //Mother of child
+                child->mother=NULL;
+                root->child=NULL;
+            }else if(strcmp(child->father->name,root->name)==0){
+                //Father of child
+                child->father=NULL;
+                root->child=NULL;
+            }
+        }else if(child->mother!=NULL){
+            child->mother=NULL;
+        }else if(child->father!=NULL){
+            child->father=NULL;
+        }
+    }
+    //Get parents
+    person* mother = root->mother;
+    person* father = root->father;
+    free(root);
+    if(mother!=NULL && father!=NULL){
+        //Leaf
+        mother->child=NULL;
+        father->child=NULL;
+        delete(mother);
+        delete(father);
+    }else if(father!=NULL){
+        //Father is null
+        father->child=NULL;
+        delete(father);
+    }else if(mother!=NULL){
+        //Mother is
+        mother->child=NULL;
+        delete(mother);
+    }
+    return 1;
+}
+
+void deleteHandler(person* root){
+    printf("Please specify the name to delete\n");
+    //Take input of user
+    char *userInpName = malloc(sizeof(char)*33);
+    receiveLineOfInputSTDIN(userInpName,33);
+    //Search for node to delete
+    person* nodeToDelete = search(userInpName, root);
+    if(nodeToDelete==NULL){
+        //Node was not found
+        printf("Person not found\n");
+    }else{
+        delete(nodeToDelete);
+    }
+    free(userInpName);
 }
 int print(struct person* root, int tabNumber){
     if(root!=NULL){
@@ -55,7 +115,7 @@ void beginFamilyTreeInput(struct person* root){
         if(strcmp(userInput,"add")==0){
             addRelation(root);
         }else if(strcmp(userInput,"delete")==0){
-            printf("delete\n");
+            deleteHandler(root);
         }else if(strcmp(userInput,"print")==0){
             print(root,0);
         }else if(strcmp(userInput,"quit")==0){
@@ -107,7 +167,8 @@ void addRelation(struct person* root){
                 //Create parent node
                 person* parentNode = createPerson(mallocParent);
                 childNode->father=parentNode;
-                printf("%s,%s\n",childNode->name,childNode->father->name);
+                childNode->father->child = childNode;
+                printf("%s,%s,%s\n",childNode->name,childNode->father->name, childNode->father->child->name);
             }else{
                 //Already has a father
                 printf("Already has a father\n");
@@ -118,7 +179,8 @@ void addRelation(struct person* root){
                 //Create parent node
                 person* parentNode = createPerson(mallocParent);
                 childNode->mother=parentNode;
-                printf("%s,%s\n",childNode->name,childNode->mother->name);
+                childNode->mother->child = childNode;
+                printf("%s,%s,%s\n",childNode->name,childNode->mother->name,childNode->mother->child->name);
             }else{
                 //Already has a mother
                 printf("Already has a mother\n");
@@ -186,4 +248,5 @@ void initializeNode(person ** node){
     (*node)->name = NULL;
     (*node)->father = NULL;
     (*node)->mother = NULL;
+    (*node)->child = NULL;
 }
