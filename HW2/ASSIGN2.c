@@ -18,29 +18,34 @@ void beginFamilyTreeInput(person *root);
 void receiveLineOfInputSTDIN(char* userInp, int length);
 void addRelation(person *root);
 struct person *search(char *name, person *root);
-void print(struct person* root, int tabNumber);
+int print(struct person* root, int tabNumber);
 
 int main(int argc, const char * argv[]){
     struct person* rootPerson = createRootNode();
     beginFamilyTreeInput(rootPerson);
 }
-void print(struct person* root, int tabNumber){
+int print(struct person* root, int tabNumber){
     if(root!=NULL){
         for(int i = 0;i<tabNumber;i++){
             printf("\t");
         }
         printf("%s\n",root->name);
     }
-    if(root->mother!=NULL){
-        print(root->mother,++tabNumber);
-    }
     if(root->father!=NULL){
-        if(tabNumber==0){
-            print(root->father,++tabNumber);
-        }else{
-            print(root->father,tabNumber--);
-        }
+        print(root->father,++tabNumber);
+    }else{
+        return 0;
     }
+    if(root->mother!=NULL){
+        if(tabNumber==0){
+            print(root->mother,++tabNumber);
+        }else{
+            print(root->mother,tabNumber--);
+        }
+    }else{
+        return 0;
+    }
+    return 0;
 }
 void beginFamilyTreeInput(struct person* root){
     while(1){
