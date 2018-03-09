@@ -151,7 +151,7 @@ void addRelation(struct person* root){
     strcpy(mallocParent,parent);
     char* child = strtok(NULL,"");
     child[strlen(child)-1] = 0;
-    
+
     //Get node of child
     person* childNode = search(child, root);
     if(childNode==NULL){
