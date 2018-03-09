@@ -1,11 +1,14 @@
 PROGRAM assignment3
+  implicit none
   !variables
   character(len=:), allocatable :: inputFile
   character(len=:), allocatable :: outputFile
   integer arglen, a
   integer :: rowNumber,columnNumber
-  real, dimension(:,:), allocatable :: x
-  integer :: iostat
+  integer, dimension(:,:), allocatable :: x
+  integer, dimension(:), allocatable :: tmpRow
+  integer, dimension(:), allocatable :: tmpColumn
+  integer :: iostat, irow, krow, i, j, k, m, temp, icolumn, kcolumn
 
   !Get input and output files
   call GET_COMMAND_ARGUMENT(1,length=arglen)
@@ -22,14 +25,37 @@ PROGRAM assignment3
   print*, "Rows: ",rowNumber, "Columns: ",columnNumber
 
   allocate(x(rowNumber,columnNumber))
-  do I=1,n,1
-   read(1,*,IOSTAT=iostat) x(I,:)
-   print*,(int(x(I,:)))
-   if(iostat>0)then
-    stop
-   end if
-  enddo
+  allocate(tmpRow(columnNumber))
 
-  !array for storing the matrix
-  !integer :: A()
+  do i = 1, rowNumber
+    read(1,*) x(i,:)
+  end do
+
+  !sort rows
+  do j = 1, rowNumber
+    do k = 1, columnNumber
+      print*,x(j,k)
+    end do
+    print*,"New Row"
+  end do
+  print*,x(1,:)
+  print*,x(2,:)
+  print*,x(3,:)
+  print*,x(4,:)
+  print*,x(5,:)
+  print*,x(6,:)
+  !Sort columns
+  do irow = 1, rowNumber
+    krow = minloc(x(irow:rowNumber,1),dim=1)+irow-1 !location of minimum value
+    tmpRow(:) = x(irow,:)
+    x( irow,:) = x(krow,:)
+    x( krow,:) = tmpRow(:)
+  end do
+  print*,"======"
+  print*,x(1,:)
+  print*,x(2,:)
+  print*,x(3,:)
+  print*,x(4,:)
+  print*,x(5,:)
+  print*,x(6,:)
 end

@@ -1,0 +1,16 @@
+allocate(x(rowNumber,columnNumber))
+do I=1,n,1
+ read(1,*,IOSTAT=iostat) x(I,:)
+ if(iostat>0)then
+  stop
+ end if
+ !print*,(x(I,:))
+enddo
+
+do i = 0, rowNumber
+print*, i
+print*,(x(i,:))
+end do
+
+!array for storing the matrix
+!integer :: A()
