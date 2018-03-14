@@ -8,8 +8,8 @@ PROGRAM assignment3
   integer, dimension(:,:), allocatable :: x
   integer, dimension(:), allocatable :: tmpRow
   integer, dimension(:), allocatable :: tmpColumn
-  integer :: iostat, irow, krow, i, j, k, m, temp, icolumn, kcolumn
-
+  integer :: iostat, irow, krow, i, j, k, m, temp, icolumn, kcolumn, lowestVal, lowestIndex
+  lowestVal = 10000
   !Get input and output files
   call GET_COMMAND_ARGUMENT(1,length=arglen)
   allocate(character(arglen) :: inputFile)
@@ -17,12 +17,10 @@ PROGRAM assignment3
   call GET_COMMAND_ARGUMENT(2,length=arglen)
   allocate(character(arglen) :: outputFile)
   call GET_COMMAND_ARGUMENT(2,value=outputFile)
-  print*, inputFile," " ,outputFile
 
   !Read from input file for
   open(unit=1, file=inputFile, action='read')
   read(1, *) rowNumber, columnNumber
-  print*, "Rows: ",rowNumber, "Columns: ",columnNumber
 
   allocate(x(rowNumber,columnNumber))
   allocate(tmpRow(columnNumber))
@@ -34,16 +32,20 @@ PROGRAM assignment3
   !sort rows
   do j = 1, rowNumber
     do k = 1, columnNumber
-      print*,x(j,k)
+    lowestVal = x(j,k)
+    lowestIndex = k
+      do m = k, columnNumber
+        if(x(j,m)<lowestVal) then
+          lowestVal = x(j,m)
+          lowestIndex = m
+        end if
+      end do
+      !swap
+      temp = x(j,k)
+      x(j,k) = lowestVal
+      x(j,lowestIndex) = temp
     end do
-    print*,"New Row"
   end do
-  print*,x(1,:)
-  print*,x(2,:)
-  print*,x(3,:)
-  print*,x(4,:)
-  print*,x(5,:)
-  print*,x(6,:)
   !Sort columns
   do irow = 1, rowNumber
     krow = minloc(x(irow:rowNumber,1),dim=1)+irow-1 !location of minimum value
@@ -51,11 +53,9 @@ PROGRAM assignment3
     x( irow,:) = x(krow,:)
     x( krow,:) = tmpRow(:)
   end do
-  print*,"======"
-  print*,x(1,:)
-  print*,x(2,:)
-  print*,x(3,:)
-  print*,x(4,:)
-  print*,x(5,:)
-  print*,x(6,:)
+  !open to write
+  open(unit=2, file=outputFile, action='write', status="replace")
+  do i =1, rowNumber
+    write(2,*) x(i,:)
+  end do
 end
